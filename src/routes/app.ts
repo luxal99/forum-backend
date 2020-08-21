@@ -95,6 +95,7 @@ export class App {
             topic.title = req.body.question;
             topic.idTopicsCategory = req.body.id_category;
             topic.question = req.body.question;
+            topic.date = new Date().toUTCString();
 
 
             const topicService = new TopicService();
@@ -102,6 +103,13 @@ export class App {
 
             res.sendStatus(200);
 
+        })
+        this.app.get(`/${this.topicRouteName}`, async (req: Request, res: Response) => {
+            try {
+                res.send(await new TopicService().getAll())
+            } catch {
+                res.sendStatus(500)
+            }
         })
     }
 
