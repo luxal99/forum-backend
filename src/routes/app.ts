@@ -6,20 +6,31 @@ import {UserInfo} from "../entity/UserInfo";
 import {UserService} from "../service/UserService";
 import {UserInfoService} from "../service/UserInfoService";
 import {User} from "../entity/User";
+import {TopicsCategory} from "../entity/TopicsCategory";
+import {Topics} from "../entity/Topics";
+import {TopicService} from "../service/TopicService";
 
 export class App {
 
     public app: Application;
 
     private userRouteName: string;
+    private categoryRouteName: string;
+    private topicRouteName: string;
 
-    protected userInfoService: UserInfoService;
 
-    constructor(userRouteName: string) {
+    constructor(userRouteName: string, categoryRouteName: string, topicsCategoryName: string) {
         this.userRouteName = userRouteName;
+        this.categoryRouteName = categoryRouteName;
+        this.topicRouteName = topicsCategoryName;
+
         this.app = express();
+
+
         this.plugins();
         this.userRoute();
+        this.categoryRoute();
+        this.topicRoute();
     }
 
     protected plugins() {
@@ -54,11 +65,43 @@ export class App {
 
                 const user = await new UserService().findByName(req.body.username);
                 const auth = ((user != null && await bcrypt.compare(req.body.password, user.password))
-                    ? res.send({username:user.username,id:await bcrypt.hash(JSON.stringify(user.id),10)}) : res.sendStatus(403))
+                    ? res.send({
+                        username: user.username,
+                        id: await bcrypt.hash(JSON.stringify(user.id), 10)
+                    }) : res.sendStatus(403))
 
             } catch {
                 res.sendStatus(500);
             }
+        })
+    }
+
+    protected categoryRoute() {
+        this.app.get(`/${this.categoryRouteName}`, async (req: Request, res: Response) => {
+            try {
+                res.send(await TopicsCategory.find());
+            } catch {
+                res.sendStatus(500);
+            }
+        })
+    }
+
+    protected topicRoute() {
+        this.app.post(`/${this.topicRouteName}`, async (req: Request, res: Response) => {
+
+            const userService = new UserService();
+            const topic = new Topics();
+            topic.idUser = await userService.findByHashId(req.body.id_user.id);
+            topic.title = req.body.question;
+            topic.idTopicsCategory = req.body.id_category;
+            topic.question = req.body.question;
+
+
+            const topicService = new TopicService();
+            await topicService.save(topic);
+
+            res.sendStatus(200);
+
         })
     }
 

@@ -13,7 +13,7 @@ createConnection().then(async connection => {
     console.log('Connected to database')
 }).catch(error => console.log(error));
 
-const application = new App("user").app;
+const application = new App("user","category","topic").app;
 application.listen(8080,()=>{
     console.log("Listen on port 8080")
 })

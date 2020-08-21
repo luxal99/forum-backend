@@ -1,5 +1,6 @@
-import {Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, BaseEntity, Index} from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, BaseEntity, Index, OneToMany} from "typeorm";
 import {UserInfo} from "./UserInfo";
+import {Topics} from "./Topics";
 
 @Entity()
 export class User extends BaseEntity {
@@ -17,6 +18,9 @@ export class User extends BaseEntity {
     @OneToOne(type => UserInfo)
     @JoinColumn()
     idUserInfo: UserInfo;
+
+    @OneToMany(type => Topics, listOfTopics => listOfTopics.idUser)
+    listOfTopics: Topics[];
 
 
     constructor(username?: string, password?: string, idUserInfo?: UserInfo) {
