@@ -111,6 +111,14 @@ export class App {
                 res.sendStatus(500)
             }
         })
+
+        this.app.get(`/${this.topicRouteName}/:id`, async (req: Request, res: Response) => {
+
+            const topicService = new TopicService();
+            const topic = await topicService.findById(req.params.id);
+
+            res.send(topic);
+        })
     }
 
 
