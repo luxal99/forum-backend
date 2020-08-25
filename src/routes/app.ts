@@ -11,6 +11,7 @@ import {Topics} from "../entity/Topics";
 import {TopicService} from "../service/TopicService";
 import {ReplyService} from "../service/ReplyService";
 import {Replies} from "../entity/Replies";
+import {getConnection} from "typeorm";
 
 export class App {
 
@@ -97,7 +98,7 @@ export class App {
             const userService = new UserService();
             const topic = new Topics();
             topic.idUser = await userService.findByHashId(req.body.id_user.id);
-            topic.title = req.body.question;
+            topic.title = req.body.title;
             topic.idTopicsCategory = req.body.id_category;
             topic.question = req.body.question;
             topic.date = new Date().toUTCString();
@@ -124,19 +125,35 @@ export class App {
 
             res.send(topic);
         })
+
+        this.app.get(`/${this.topicRouteName}/sortByCategory/:id`,async (req:Request,res:Response)=>{
+
+            res.send(await new TopicService().groupByCategory(Number.parseInt(req.params.id)))
+
+        })
     }
 
     protected replyRoute() {
         this.app.post(`/${this.replyRouteName}`, async (req: Request, res: Response) => {
             try {
                 const replyService = new ReplyService();
-                await replyService.save(new Replies(req.body.idTopic, req.body.idUser, req.body.title));
+                const user = await new UserService().findByHashId(req.body.idUser);
+                await replyService.save(new Replies(req.body.idTopic, user, req.body.title));
 
                 res.sendStatus(200);
             } catch {
                 res.sendStatus(500);
             }
 
+        })
+
+        this.app.put(`/${this.replyRouteName}/like/:id`, async (req: Request, res: Response) => {
+            try {
+                await ReplyService.incrementLike(req.params.id)
+                res.sendStatus(200);
+            } catch {
+                res.sendStatus(500);
+            }
         })
     }
 
