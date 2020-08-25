@@ -9,6 +9,8 @@ import {User} from "../entity/User";
 import {TopicsCategory} from "../entity/TopicsCategory";
 import {Topics} from "../entity/Topics";
 import {TopicService} from "../service/TopicService";
+import {ReplyService} from "../service/ReplyService";
+import {Replies} from "../entity/Replies";
 
 export class App {
 
@@ -17,12 +19,14 @@ export class App {
     private userRouteName: string;
     private categoryRouteName: string;
     private topicRouteName: string;
+    private replyRouteName: string
 
 
-    constructor(userRouteName: string, categoryRouteName: string, topicsCategoryName: string) {
+    constructor(userRouteName: string, categoryRouteName: string, topicsCategoryName: string, replyRouteName: string) {
         this.userRouteName = userRouteName;
         this.categoryRouteName = categoryRouteName;
         this.topicRouteName = topicsCategoryName;
+        this.replyRouteName = replyRouteName;
 
         this.app = express();
 
@@ -31,6 +35,7 @@ export class App {
         this.userRoute();
         this.categoryRoute();
         this.topicRoute();
+        this.replyRoute();
     }
 
     protected plugins() {
@@ -121,5 +126,18 @@ export class App {
         })
     }
 
+    protected replyRoute() {
+        this.app.post(`/${this.replyRouteName}`, async (req: Request, res: Response) => {
+            try {
+                const replyService = new ReplyService();
+                await replyService.save(new Replies(req.body.idTopic, req.body.idUser, req.body.title));
+
+                res.sendStatus(200);
+            } catch {
+                res.sendStatus(500);
+            }
+
+        })
+    }
 
 }

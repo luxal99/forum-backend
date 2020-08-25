@@ -16,6 +16,9 @@ export class User extends BaseEntity {
     @Column()
     password: string;
 
+    @Column()
+    profilePicture: string;
+
     @OneToOne(type => UserInfo)
     @JoinColumn()
     idUserInfo: UserInfo;
