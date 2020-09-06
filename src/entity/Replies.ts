@@ -1,6 +1,7 @@
-import {BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
+import {BaseEntity, Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
 import {Topics} from "./Topics";
 import {User} from "./User";
+import {Message} from "./Message";
 
 @Entity()
 export class Replies extends BaseEntity {

@@ -1,7 +1,19 @@
-import {Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, BaseEntity, Index, OneToMany} from "typeorm";
+import {
+    Entity,
+    PrimaryGeneratedColumn,
+    Column,
+    OneToOne,
+    JoinColumn,
+    BaseEntity,
+    Index,
+    OneToMany,
+    ManyToMany, ManyToOne
+} from "typeorm";
 import {UserInfo} from "./UserInfo";
 import {Topics} from "./Topics";
 import {Replies} from "./Replies";
+import {type} from "os";
+import {Message} from "./Message";
 
 @Entity()
 export class User extends BaseEntity {
@@ -28,6 +40,16 @@ export class User extends BaseEntity {
 
     @OneToMany(type => Replies, listOfReplies => listOfReplies.idUser)
     listOfReplies: Topics[];
+
+    @ManyToMany(type=>Topics,topic=>topic.listOfUsersWhichPinnedTopic)
+    listOfPinnedTopics:Topics[];
+
+
+    @ManyToOne(type => Message,message =>message.senderId)
+    listOfSentMessages:Message[];
+
+    @ManyToOne(type => Message,message =>message.receiverId)
+    listOfReceivedMessages:Message[];
 
 
 

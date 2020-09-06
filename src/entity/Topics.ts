@@ -1,4 +1,4 @@
-import {BaseEntity, Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn} from "typeorm";
+import {BaseEntity, Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn} from "typeorm";
 import {User} from "./User";
 import {TopicsCategory} from "./TopicsCategory";
 import {Replies} from "./Replies";
@@ -17,7 +17,7 @@ export class Topics extends BaseEntity {
     question: string
 
     @Column()
-    date:string;
+    date: string;
 
     @ManyToOne(type => User, id => id.listOfTopics)
     idUser: User
@@ -27,5 +27,9 @@ export class Topics extends BaseEntity {
 
     @OneToMany(type => Replies, listOfReplies => listOfReplies.idTopics)
     listOfReplies: Replies[];
+
+    @ManyToMany(type => User, user => user.listOfPinnedTopics)
+    @JoinTable()
+    listOfUsersWhichPinnedTopic: User[];
 
 }

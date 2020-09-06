@@ -12,6 +12,8 @@ import {TopicService} from "../service/TopicService";
 import {ReplyService} from "../service/ReplyService";
 import {Replies} from "../entity/Replies";
 import {getConnection} from "typeorm";
+import {Message} from "../entity/Message";
+import {MessageService} from "../service/MessageService";
 
 export class App {
 
@@ -21,13 +23,16 @@ export class App {
     private categoryRouteName: string;
     private topicRouteName: string;
     private replyRouteName: string
+    private messageRouteName: string;
 
 
-    constructor(userRouteName: string, categoryRouteName: string, topicsCategoryName: string, replyRouteName: string) {
+    constructor(userRouteName: string, categoryRouteName: string, topicsCategoryName: string, replyRouteName: string, messageRouteName: string) {
+
         this.userRouteName = userRouteName;
         this.categoryRouteName = categoryRouteName;
         this.topicRouteName = topicsCategoryName;
         this.replyRouteName = replyRouteName;
+        this.messageRouteName = messageRouteName;
 
         this.app = express();
 
@@ -37,6 +42,7 @@ export class App {
         this.categoryRoute();
         this.topicRoute();
         this.replyRoute();
+        this.messageRoute()
     }
 
     protected plugins() {
@@ -126,9 +132,20 @@ export class App {
             res.send(topic);
         })
 
-        this.app.get(`/${this.topicRouteName}/sortByCategory/:id`,async (req:Request,res:Response)=>{
+        this.app.get(`/${this.topicRouteName}/sortByCategory/:id`, async (req: Request, res: Response) => {
 
             res.send(await new TopicService().groupByCategory(Number.parseInt(req.params.id)))
+
+        })
+
+        this.app.put(`/${this.topicRouteName}/pin`, async (req: Request, res: Response) => {
+
+            const user = new Array<User>();
+            user.push(req.body.user);
+
+            const topicService = await new TopicService().pinTopic(Number.parseInt(req.body.id), user);
+
+            res.sendStatus(200);
 
         })
     }
@@ -152,6 +169,17 @@ export class App {
                 await ReplyService.incrementLike(req.params.id)
                 res.sendStatus(200);
             } catch {
+                res.sendStatus(500);
+            }
+        })
+    }
+
+    protected messageRoute() {
+        this.app.post(`/${this.messageRouteName}`, async (req: Request, res: Response) => {
+            try {
+                res.send(
+                    await new MessageService().save(new Message(req.body.sender, req.body.receiver, req.body.message)))
+            } catch (e) {
                 res.sendStatus(500);
             }
         })

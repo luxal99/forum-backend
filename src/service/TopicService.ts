@@ -1,5 +1,7 @@
 import {AbstractService} from "./AbstractService";
 import {Topics} from "../entity/Topics";
+import {getConnection} from "typeorm";
+import {User} from "../entity/User";
 
 const _ = require('lodash')
 
@@ -24,11 +26,17 @@ export class TopicService extends AbstractService<Topics> {
         return topicById;
     }
 
-    async groupByCategory(categoryId:Number): Promise<Topics[]> {
+    async groupByCategory(categoryId: Number): Promise<Topics[]> {
         let topicArr = await this.getAll();
 
         let sorted: Topics[];
         sorted = topicArr.filter(topic => topic.idTopicsCategory.id === categoryId);
         return sorted;
+    }
+
+    async pinTopic(id: number, user: User[]) {
+        await getConnection().createQueryBuilder().update(Topics).set({
+            listOfUsersWhichPinnedTopic: user
+        }).where("id=:id", {id: 15}).execute();
     }
 }
