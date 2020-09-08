@@ -1,4 +1,5 @@
 import {BaseEntity, EntityManager, getManager} from "typeorm";
+import {Message} from "../entity/Message";
 
 export class AbstractService<T extends BaseEntity> {
 
@@ -17,7 +18,6 @@ export class AbstractService<T extends BaseEntity> {
     async delete(entity: T) {
         await this.manager.remove(entity);
     }
-
 
 
 }

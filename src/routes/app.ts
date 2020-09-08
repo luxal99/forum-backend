@@ -11,7 +11,6 @@ import {Topics} from "../entity/Topics";
 import {TopicService} from "../service/TopicService";
 import {ReplyService} from "../service/ReplyService";
 import {Replies} from "../entity/Replies";
-import {getConnection} from "typeorm";
 import {Message} from "../entity/Message";
 import {MessageService} from "../service/MessageService";
 
@@ -86,6 +85,14 @@ export class App {
                 res.sendStatus(500);
             }
         })
+
+        this.app.post(`/${this.userRouteName}/findUserByHash`, async (req: Request, res: Response) => {
+            try {
+                res.send(await new UserService().findByHashId(req.body.token));
+            } catch (e) {
+                res.send(e)
+            }
+        })
     }
 
     protected categoryRoute() {
@@ -143,8 +150,7 @@ export class App {
             const user = new Array<User>();
             user.push(req.body.user);
 
-            const topicService = await new TopicService().pinTopic(Number.parseInt(req.body.id), user);
-
+            await new TopicService().pinTopic(Number.parseInt(req.body.id), user);
             res.sendStatus(200);
 
         })
@@ -177,8 +183,16 @@ export class App {
     protected messageRoute() {
         this.app.post(`/${this.messageRouteName}`, async (req: Request, res: Response) => {
             try {
-                res.send(
-                    await new MessageService().save(new Message(req.body.sender, req.body.receiver, req.body.message)))
+                res.send(await new MessageService().save(new Message(req.body.senderId, req.body.receiverId, req.body.message)))
+            } catch (e) {
+                res.sendStatus(500);
+            }
+        })
+
+        this.app.post(`/${this.messageRouteName}/get`, async (req: Request, res: Response) => {
+            try {
+
+                res.send(await new MessageService().getAll(req.body.senderId, req.body.receiverId));
             } catch (e) {
                 res.sendStatus(500);
             }

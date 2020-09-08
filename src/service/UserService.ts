@@ -17,12 +17,9 @@ export class UserService extends AbstractService<User> {
         const users = await User.find();
 
         for (const user of users) {
-            console.log(JSON.stringify(user.id))
             if (await bcrypt.compare(JSON.stringify(user.id), id)) {
-               return user;
+                return user;
             }
-
-
         }
 
         return null;
