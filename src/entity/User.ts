@@ -59,5 +59,7 @@ export class User extends BaseEntity {
         this.username = username;
         this.password = password;
         this.idUserInfo = idUserInfo;
+
+        this.profilePicture = '';
     }
 }

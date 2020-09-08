@@ -54,6 +54,7 @@ export class App {
         this.app.post(`/${this.userRouteName}`, async (req: Request, res: Response) => {
 
             try {
+                console.log(req.body);
                 const userInfo = new UserInfo(req.body.userInfo.full_name, req.body.userInfo.email);
                 const userInfoService = new UserInfoService();
 
@@ -66,8 +67,8 @@ export class App {
                     res.sendStatus(200);
                 });
 
-            } catch {
-                res.sendStatus(500);
+            } catch(e) {
+                res.send(e);
             }
         })
 
