@@ -24,6 +24,21 @@ export class MessageService extends AbstractService<Message> {
         return chat;
     }
 
+    async groupMessageByUser(user: User) {
+
+        let messages: Message[] = await this.manager.find(Message, {relations: ['senderId', 'receiverId']});
+        const users:User[] = [];
+
+        messages.forEach(mess => {
+            if (mess.senderId.id === user.id) {
+                if (users.findIndex(x => x.id === mess.receiverId.id))
+                    users.push(mess.receiverId)
+            }
+        })
+
+        return users;
+    }
+
     async delete(entity: Message): Promise<void> {
         await super.delete(entity);
     }

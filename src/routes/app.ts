@@ -66,7 +66,7 @@ export class App {
                     res.sendStatus(200);
                 });
 
-            } catch(e) {
+            } catch (e) {
                 res.send(e);
             }
         })
@@ -184,6 +184,15 @@ export class App {
         this.app.post(`/${this.messageRouteName}`, async (req: Request, res: Response) => {
             try {
                 res.send(await new MessageService().save(new Message(req.body.senderId, req.body.receiverId, req.body.message)))
+            } catch (e) {
+                res.sendStatus(500);
+            }
+        })
+
+        this.app.get(`/${this.messageRouteName}/:id`, async (req: Request, res: Response) => {
+            try {
+                const user = await new UserService().findByHashId(req.params.id);
+                res.send(await new MessageService().groupMessageByUser(user))
             } catch (e) {
                 res.sendStatus(500);
             }
