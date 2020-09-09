@@ -20,16 +20,28 @@ export class MessageService extends AbstractService<Message> {
 
             if ((mess.receiverId.id === receiverId.id && mess.senderId.id === senderId.id) || (mess.senderId.id === receiverId.id && mess.receiverId.id === senderId.id)) {
                 chat.push(mess);
-                if (mess.receiverId.id === senderId.id){
+                if (mess.receiverId.id === senderId.id) {
                     await getConnection().createQueryBuilder().update(Message).set({
                         isRead: true
-                    }).where("id = :id",{id:mess.id}).execute()
+                    }).where("id = :id", {id: mess.id}).execute()
                 }
             }
 
 
         }
         return chat;
+    }
+
+    async findUnreadMessages(user: User) {
+        let messages: Message[] = await this.manager.find(Message, {relations: ['senderId', 'receiverId']});
+        const unreadMessages: Message[] = []
+
+        messages.forEach(mess =>{
+            if (mess.receiverId.id === user.id && !mess.isRead)
+                unreadMessages.push(mess)
+        })
+
+        return unreadMessages
     }
 
     async groupMessageByUser(user: User) {
