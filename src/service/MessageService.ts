@@ -46,7 +46,7 @@ export class MessageService extends AbstractService<Message> {
 
     async groupMessageByUser(user: User) {
 
-        let messages: Message[] = await this.manager.find(Message, {relations: ['senderId', 'receiverId']});
+        let messages: Message[] = await this.manager.find(Message, {relations: ['senderId', 'receiverId','senderId.idUserInfo','receiverId.idUserInfo']});
         const users: User[] = [];
 
         messages.forEach(mess => {

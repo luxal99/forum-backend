@@ -189,9 +189,9 @@ export class App {
             }
         })
 
-        this.app.get(`/${this.messageRouteName}/:id`, async (req: Request, res: Response) => {
+        this.app.post(`/${this.messageRouteName}/getChats`, async (req: Request, res: Response) => {
             try {
-                const user = await new UserService().findByHashId(req.params.id);
+                const user = await new UserService().findByHashId(req.body.id);
                 res.send(await new MessageService().groupMessageByUser(user))
             } catch (e) {
                 res.sendStatus(500);
