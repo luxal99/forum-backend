@@ -49,7 +49,7 @@ export class TopicService extends AbstractService<Topics> {
         let user = await new UserService().findByHashId(token);
 
         replies.forEach(reply =>{
-            if (reply.idUser.id === user.id)
+            if (reply.idUser.id === user.id && topics.findIndex(x => x.id === reply.idTopics.id ))
                 topics.push(reply.idTopics)
         })
 
