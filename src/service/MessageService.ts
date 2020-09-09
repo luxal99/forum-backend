@@ -16,26 +16,31 @@ export class MessageService extends AbstractService<Message> {
         const messages = await this.manager.find(Message, {relations: ['senderId', 'receiverId']});
 
         const chat = [];
-        messages.forEach(mess => {
+        for (const mess of messages) {
 
-            if ((mess.receiverId.id === receiverId.id && mess.senderId.id === senderId.id) || (mess.senderId.id === receiverId.id && mess.receiverId.id === senderId.id))
+            if ((mess.receiverId.id === receiverId.id && mess.senderId.id === senderId.id) || (mess.senderId.id === receiverId.id && mess.receiverId.id === senderId.id)) {
                 chat.push(mess);
-        })
+                if (mess.receiverId.id === senderId.id){
+                    await getConnection().createQueryBuilder().update(Message).set({
+                        isRead: true
+                    }).where("id = :id",{id:mess.id}).execute()
+                }
+            }
+
+
+        }
         return chat;
     }
 
     async groupMessageByUser(user: User) {
 
         let messages: Message[] = await this.manager.find(Message, {relations: ['senderId', 'receiverId']});
-        const users:User[] = [];
+        const users: User[] = [];
 
         messages.forEach(mess => {
-            if (mess.senderId.id === user.id) {
-                if (users.findIndex(x => x.id === mess.receiverId.id))
-                    users.push(mess.receiverId)
-            }
+            if (mess.senderId.id === user.id && users.findIndex(x => x.id === mess.receiverId.id))
+                users.push(mess.receiverId)
         })
-
         return users;
     }
 
