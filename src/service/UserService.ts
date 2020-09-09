@@ -1,6 +1,7 @@
 import {AbstractService} from "./AbstractService";
 import {User} from "../entity/User";
 import bcrypt = require("bcrypt");
+import {getConnection} from "typeorm";
 
 export class UserService extends AbstractService<User> {
 
@@ -23,6 +24,15 @@ export class UserService extends AbstractService<User> {
         }
 
         return null;
+    }
+
+
+    async uploadProfilePhoto(url: string, token: string) {
+
+        const user = await this.findByHashId(token);
+        await getConnection().createQueryBuilder().update(User).set({
+            profilePicture: url
+        }).where("id=:id", {id: user.id}).execute();
     }
 
 

@@ -13,6 +13,11 @@ import {ReplyService} from "../service/ReplyService";
 import {Replies} from "../entity/Replies";
 import {Message} from "../entity/Message";
 import {MessageService} from "../service/MessageService";
+import path = require('path');
+
+const cors = require('cors');
+const fileUpload = require('express-fileupload');
+const fs = require('fs');
 
 export class App {
 
@@ -46,6 +51,11 @@ export class App {
 
     protected plugins() {
         this.app.use(bodyParser.json());
+        this.app.use(bodyParser.urlencoded({extended: false}));
+        this.app.use(express.static(path.join(__dirname, 'public')));
+        this.app.use(cors());
+        this.app.use(bodyParser.json({limit: '50mb', type: 'application/json'}));
+
     }
 
     protected userRoute() {
@@ -91,6 +101,17 @@ export class App {
                 res.send(await new UserService().findByHashId(req.body.token));
             } catch (e) {
                 res.send(e)
+            }
+        })
+
+        this.app.post(`/${this.userRouteName}/uploadPhoto`, async (req: Request, res: Response) => {
+
+            console.log(req.body)
+            try {
+                await new UserService().uploadProfilePhoto(req.body.image, req.body.token)
+                res.sendStatus(200);
+            } catch (e) {
+                res.sendStatus(e);
             }
         })
     }

@@ -60,6 +60,6 @@ export class User extends BaseEntity {
         this.password = password;
         this.idUserInfo = idUserInfo;
 
-        this.profilePicture = '';
+        this.profilePicture = 'https://firebasestorage.googleapis.com/v0/b/soy-smile-249718.appspot.com/o/defult_image.png?alt=media&token=5a50dd1b-7f31-4bdd-909e-5eb1aa1262cb';
     }
 }
