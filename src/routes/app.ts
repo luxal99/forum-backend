@@ -175,6 +175,14 @@ export class App {
             res.sendStatus(200);
 
         })
+
+        this.app.post(`/${this.topicRouteName}/findTopicByUser`, async (req: Request, res: Response) => {
+            try {
+                res.send(await new TopicService().findTopicByUser(req.body.token))
+            } catch (e) {
+                res.send(e)
+            }
+        })
     }
 
     protected replyRoute() {

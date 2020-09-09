@@ -9,6 +9,10 @@ export class ReplyService extends AbstractService<Replies> {
         await super.save(entity);
     }
 
+    async getAll():Promise<Replies[]>{
+        return  await this.manager.find(Replies,{relations:['idTopics','idUser']})
+    }
+
     static async incrementLike(id) {
         await getConnection().createQueryBuilder().update(Replies).set({
             likes: ()=>"likes + 1"

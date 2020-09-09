@@ -2,6 +2,9 @@ import {AbstractService} from "./AbstractService";
 import {Topics} from "../entity/Topics";
 import {getConnection} from "typeorm";
 import {User} from "../entity/User";
+import {UserService} from "./UserService";
+import {Replies} from "../entity/Replies";
+import {ReplyService} from "./ReplyService";
 
 const _ = require('lodash')
 
@@ -38,5 +41,18 @@ export class TopicService extends AbstractService<Topics> {
         await getConnection().createQueryBuilder().update(Topics).set({
             listOfUsersWhichPinnedTopic: user
         }).where("id=:id", {id: 15}).execute();
+    }
+
+    async findTopicByUser(token) {
+        let topics: Topics[] = [];
+        let replies = await new ReplyService().getAll();
+        let user = await new UserService().findByHashId(token);
+
+        replies.forEach(reply =>{
+            if (reply.idUser.id === user.id)
+                topics.push(reply.idTopics)
+        })
+
+        return topics;
     }
 }
