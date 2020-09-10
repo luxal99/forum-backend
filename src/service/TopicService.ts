@@ -16,7 +16,10 @@ export class TopicService extends AbstractService<Topics> {
     }
 
     async getAll(): Promise<Topics[]> {
-        return await Topics.find({relations: ['listOfReplies', 'idUser', 'idUser.idUserInfo', 'idTopicsCategory', 'listOfReplies.idUser']})
+        let topics = await Topics.find({relations: ['listOfReplies', 'idUser', 'idUser.idUserInfo', 'idTopicsCategory', 'listOfReplies.idUser']});
+
+        topics.sort();
+        return topics.reverse()
     }
 
     async findById(id): Promise<Topics> {
