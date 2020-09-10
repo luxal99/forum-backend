@@ -37,22 +37,26 @@ export class TopicService extends AbstractService<Topics> {
         return sorted;
     }
 
-    async pinTopic(id: number, user: User[]) {
+    async pinTopic(topics: Topics, user: User) {
+
         await getConnection().createQueryBuilder().update(Topics).set({
-            listOfUsersWhichPinnedTopic: user
-        }).where("id=:id", {id: 15}).execute();
+            listOfUsersWhichPinnedTopic: topics.listOfUsersWhichPinnedTopic,
+        }).where("id=:id", {id: topics.id}).execute();
     }
 
-    async findTopicByUser(token) {
-        let topics: Topics[] = [];
-        let replies = await new ReplyService().getAll();
-        let user = await new UserService().findByHashId(token);
+    async findTopicsByUser(token) {
+        const user = await new UserService().findByHashId(token);
+        const topics = await this.getAll();
+        let topicsByUser: Topics[] = []
 
-        replies.forEach(reply =>{
-            if (reply.idUser.id === user.id && topics.findIndex(x => x.id === reply.idTopics.id ))
-                topics.push(reply.idTopics)
+        topics.forEach(topic => {
+            if (topic.idUser.id === user.id)
+                topicsByUser.push(topic)
         })
 
-        return topics;
+
+        return topicsByUser;
     }
+
+
 }

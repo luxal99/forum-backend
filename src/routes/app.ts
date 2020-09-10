@@ -88,6 +88,7 @@ export class App {
                 const auth = ((user != null && await bcrypt.compare(req.body.password, user.password))
                     ? res.send({
                         username: user.username,
+                        pinnedTopics: user.listOfPinnedTopics,
                         id: await bcrypt.hash(JSON.stringify(user.id), 10)
                     }) : res.sendStatus(403))
 
@@ -168,21 +169,22 @@ export class App {
 
         this.app.put(`/${this.topicRouteName}/pin`, async (req: Request, res: Response) => {
 
-            const user = new Array<User>();
-            user.push(req.body.user);
+            let user = new User();
+            user = req.body.user;
 
-            await new TopicService().pinTopic(Number.parseInt(req.body.id), user);
+            await new TopicService().pinTopic(req.body.topicsId, user);
             res.sendStatus(200);
 
         })
 
         this.app.post(`/${this.topicRouteName}/findTopicByUser`, async (req: Request, res: Response) => {
             try {
-                res.send(await new TopicService().findTopicByUser(req.body.token))
+                res.send(await new TopicService().findTopicsByUser(req.body.token))
             } catch (e) {
-                res.send(e)
+                res.send(e);
             }
         })
+
     }
 
     protected replyRoute() {
@@ -205,6 +207,15 @@ export class App {
                 res.sendStatus(200);
             } catch {
                 res.sendStatus(500);
+            }
+        })
+
+
+        this.app.post(`/${this.replyRouteName}/findRepliesByUser`, async (req: Request, res: Response) => {
+            try {
+                res.send(await new ReplyService().findAnswers(req.body.token))
+            } catch (e) {
+                res.send(e)
             }
         })
     }
