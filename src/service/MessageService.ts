@@ -1,9 +1,9 @@
 import {AbstractService} from "./AbstractService";
 import {Message} from "../entity/Message";
 import {User} from "../entity/User";
+import {getConnection} from "typeorm";
 
 const _ = require('lodash');
-import {getConnection} from "typeorm";
 
 export class MessageService extends AbstractService<Message> {
 
@@ -47,14 +47,23 @@ export class MessageService extends AbstractService<Message> {
     async groupMessageByUser(user: User) {
 
         let messages: Message[] = await this.manager.find(Message, {relations: ['senderId', 'receiverId','senderId.idUserInfo','receiverId.idUserInfo']});
-        const users: User[] = [];
+        let users: User[] = [];
 
         messages.forEach(mess => {
-            if (mess.senderId.id === user.id && users.findIndex(x => x.id === mess.receiverId.id))
+            if (mess.senderId.id === user.id)
                 users.push(mess.receiverId)
         })
-        return users;
+
+        return users.reduce((acc, current) => {
+            const x = acc.find(item => item.id === current.id);
+            if (!x) {
+                return acc.concat([current]);
+            } else {
+                return acc;
+            }
+        }, []);
     }
+
 
     async delete(entity: Message): Promise<void> {
         await super.delete(entity);
