@@ -247,7 +247,7 @@ export class App {
             }
         })
 
-        this.app.get(`/${this.messageRouteName}/unread`, async (req: Request, res: Response) => {
+        this.app.post(`/${this.messageRouteName}/unread`, async (req: Request, res: Response) => {
             try {
                 res.send(await new MessageService().findUnreadMessages(await new UserService().findByHashId(req.body.id)));
             } catch (e) {

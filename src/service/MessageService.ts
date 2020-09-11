@@ -36,7 +36,7 @@ export class MessageService extends AbstractService<Message> {
         let messages: Message[] = await this.manager.find(Message, {relations: ['senderId', 'receiverId']});
         const unreadMessages: Message[] = []
 
-        messages.forEach(mess =>{
+        messages.forEach(mess => {
             if (mess.receiverId.id === user.id && !mess.isRead)
                 unreadMessages.push(mess)
         })
@@ -46,13 +46,16 @@ export class MessageService extends AbstractService<Message> {
 
     async groupMessageByUser(user: User) {
 
-        let messages: Message[] = await this.manager.find(Message, {relations: ['senderId', 'receiverId','senderId.idUserInfo','receiverId.idUserInfo']});
+        let messages: Message[] = await this.manager.find(Message, {relations: ['senderId', 'receiverId', 'senderId.idUserInfo', 'receiverId.idUserInfo']});
         let users: User[] = [];
 
         messages.forEach(mess => {
             if (mess.senderId.id === user.id)
                 users.push(mess.receiverId)
+            else if (mess.receiverId.id == user.id)
+                users.push(mess.senderId)
         })
+
 
         return users.reduce((acc, current) => {
             const x = acc.find(item => item.id === current.id);
